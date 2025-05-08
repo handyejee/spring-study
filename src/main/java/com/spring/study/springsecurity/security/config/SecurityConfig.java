@@ -4,15 +4,20 @@ import com.spring.study.springsecurity.security.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 
+//@EnableMethodSecurity() // 메소드 기반 권한 부여
 @EnableWebSecurity
 @Configuration
 @RequiredArgsConstructor
@@ -34,19 +39,32 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
-        .csrf(AbstractHttpConfigurer::disable)  // REST API에서는 CSRF 보호를 비활성화
+        .csrf(AbstractHttpConfigurer::disable)
+        .sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // 세션을 사용하지 않음
+        )
         .authorizeHttpRequests(auth -> auth
         .requestMatchers(
             "/api/auth/signup",
             "/api/auth/login",
             "/",            // 메인 페이지
             "/error"        // 에러 페이지
-        ).permitAll()
-            .anyRequest().authenticated()
+        ).permitAll() // 인증 필요없는 url 설정
+
+        // 사용자 삭제
+        .requestMatchers("/api/admin/**").hasAuthority("DELETE")
+
+        // 전체 사용자 목록 조회 - ADMIN 역할
+        .requestMatchers(HttpMethod.GET, "/api/users").hasAnyRole("ADMIN", "MANAGER")  // 전체 사용자 조회 (관리자만)
+
+        // 사용자 단건조회(본인 or MANAGER)
+        .requestMatchers(HttpMethod.GET, "/api/users/{id}").access(
+            new WebExpressionAuthorizationManager(
+                "hasRole('MANAGER') or #id == authentication.principal.id")
         )
-        .sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // 세션을 사용하지 않음
-        );
+         .anyRequest().authenticated()
+        )
+        .httpBasic(Customizer.withDefaults());
     return http.build();
   }
 }
