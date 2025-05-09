@@ -2,7 +2,7 @@ package com.spring.study.springsecurity.security.refresh.controller;
 
 import com.spring.study.springsecurity.security.refresh.dto.CreateAccessTokenRequest;
 import com.spring.study.springsecurity.security.refresh.dto.CreateAccessTokenResponse;
-import com.spring.study.springsecurity.user.service.TokenService;
+import com.spring.study.springsecurity.security.refresh.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

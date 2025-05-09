@@ -1,14 +1,10 @@
-package com.spring.study.springsecurity.user.service;
+package com.spring.study.springsecurity.security.refresh.service;
 
 import com.spring.study.springsecurity.jwt.JwtTokenProvider;
 import com.spring.study.springsecurity.security.refresh.domain.RefreshToken;
-import com.spring.study.springsecurity.security.refresh.service.RefreshTokenService;
-import com.spring.study.springsecurity.user.domain.User;
 import com.spring.study.springsecurity.user.domain.UserRole;
-import com.spring.study.springsecurity.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
-import jakarta.transaction.Transactional;
-import java.time.Duration;
+
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
@@ -19,7 +15,6 @@ public class TokenService {
 
   private final RefreshTokenService refreshTokenService;
   private final JwtTokenProvider jwtTokenProvider;
-  private final UserService userService;
 
   public String createNewAccessToken(String refreshToken) {
     if (!jwtTokenProvider.validateToken(refreshToken)) {

@@ -1,6 +1,5 @@
 package com.spring.study.springsecurity.user.dto;
 
-import com.spring.study.springsecurity.user.domain.User;
 import com.spring.study.springsecurity.user.domain.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
