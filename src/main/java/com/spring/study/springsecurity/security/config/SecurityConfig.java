@@ -1,12 +1,16 @@
 package com.spring.study.springsecurity.security.config;
 
+import com.spring.study.springsecurity.jwt.JwtTokenProvider;
+import com.spring.study.springsecurity.security.refresh.service.RefreshTokenService;
+import com.spring.study.springsecurity.security.service.JwtAuthenticationFilter;
+import com.spring.study.springsecurity.security.service.JwtAuthorizationFilter;
 import com.spring.study.springsecurity.security.service.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,7 +20,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+@Slf4j
 //@EnableMethodSecurity() // 메소드 기반 권한 부여
 @EnableWebSecurity
 @Configuration
@@ -24,6 +30,9 @@ import org.springframework.security.web.access.expression.WebExpressionAuthoriza
 public class SecurityConfig {
 
   private final UserDetailsServiceImpl userDetailsService;
+  private final JwtTokenProvider jwtTokenProvider;
+  private final AuthenticationConfiguration authenticationConfiguration;
+  private final RefreshTokenService refreshTokenService;
 
   @Bean
   public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -37,16 +46,35 @@ public class SecurityConfig {
   }
 
   @Bean
+  public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) throws Exception {
+    JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtTokenProvider, refreshTokenService);
+    filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
+
+    return filter;
+  }
+
+  @Bean
+  public JwtAuthorizationFilter jwtAuthorizationFilter() {
+    return new JwtAuthorizationFilter(userDetailsService, jwtTokenProvider);
+  }
+
+  @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(session -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // 세션을 사용하지 않음
         )
+        .httpBasic(AbstractHttpConfigurer::disable) // httpBasic 인증 비활성화
+
+        .addFilter(jwtAuthenticationFilter(jwtTokenProvider)) // 로그인 처리 필터
+        .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class) // 토큰 검증 필터
+
         .authorizeHttpRequests(auth -> auth
         .requestMatchers(
             "/api/auth/signup",
             "/api/auth/login",
+            "/api/token/refresh",
             "/",            // 메인 페이지
             "/error"        // 에러 페이지
         ).permitAll() // 인증 필요없는 url 설정
@@ -63,8 +91,8 @@ public class SecurityConfig {
                 "hasRole('MANAGER') or #id == authentication.principal.id")
         )
          .anyRequest().authenticated()
-        )
-        .httpBasic(Customizer.withDefaults());
+        );
+
     return http.build();
   }
 }

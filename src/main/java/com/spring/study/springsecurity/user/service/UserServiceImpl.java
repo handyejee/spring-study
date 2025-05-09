@@ -38,22 +38,26 @@ public class UserServiceImpl implements UserService{
         userRepository.save(request.toEntity(passwordEncoder)));
   }
 
-  @Transactional(readOnly = true)
-  public LoginResponseDto login(LoginRequestDto request) {
-    // 인증 시도
-    Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-    );
-
-    // SecurityContext에 인증 정보 저장
-    SecurityContextHolder.getContext().setAuthentication(authentication);
-
-    // 로그인 성공한 유저 정보 조회
-    User user = userRepository.findByUsername(request.getUsername())
-        .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
-
-    return new LoginResponseDto(user.getId(), user.getEmail(), user.getUsername());
-  }
+  /*
+   * JWT 인증 방식 도입으로 인해 더 이상 사용되지 않음.
+   * JwtAuthenticationFilter에서 인증 처리를 담당함.
+   */
+//  @Transactional(readOnly = true)
+//  public LoginResponseDto login(LoginRequestDto request) {
+//    // 인증 시도
+//    Authentication authentication = authenticationManager.authenticate(
+//        new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+//    );
+//
+//    // SecurityContext에 인증 정보 저장
+//    SecurityContextHolder.getContext().setAuthentication(authentication);
+//
+//    // 로그인 성공한 유저 정보 조회
+//    User user = userRepository.findByUsername(request.getUsername())
+//        .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+//
+//    return new LoginResponseDto(user.getId(), user.getEmail(), user.getUsername());
+//  }
 
   @Transactional(readOnly = true)
   public UserResponseDto getUserById(Long userId) {
