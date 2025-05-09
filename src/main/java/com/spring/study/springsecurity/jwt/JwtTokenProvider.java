@@ -74,11 +74,6 @@ public class JwtTokenProvider {
         .getPayload();
   }
 
-  public Long getUserIdFromToken(String token) {
-    Claims claims = getUserInfoFromToken(token);
-    return claims.get("userId", Long.class);
-  }
-
   // header 에서 JWT 가져오기
   public String getJwtFromHeader(HttpServletRequest request) {
     String authHeader = request.getHeader(AUTHORIZATION_HEADER);
@@ -110,9 +105,5 @@ public class JwtTokenProvider {
       log.error("JWT claims is empty");
       throw new AuthenticationException("잘못된 JWT 토큰 입니다.") {};
     }
-  }
-
-  public LocalDateTime getAccessTokenExpiration() {
-    return LocalDateTime.now().plusSeconds(ACCESS_TOKEN_TIME / 1000);
   }
 }
