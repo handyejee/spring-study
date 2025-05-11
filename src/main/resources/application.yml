@@ -21,7 +21,16 @@ spring:
       org.hibernate.type: trace
       org.springframework.security: debug
       com.spring.study.springsecurity.security: TRACE
-
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - profile
+              - email
 jwt:
   secret:
     key: RGV2U2VjS2V5MjAyNXhZekdoVHE3THBSOXZGMXVNNE5uQzBwdXBweWNhdGdiaXJkZ2lhbnRwYW5kYW

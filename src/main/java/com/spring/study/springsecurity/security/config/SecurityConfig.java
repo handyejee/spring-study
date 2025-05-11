@@ -1,6 +1,9 @@
 package com.spring.study.springsecurity.security.config;
 
 import com.spring.study.springsecurity.jwt.JwtTokenProvider;
+import com.spring.study.springsecurity.oauth.CustomOAuth2UserService;
+import com.spring.study.springsecurity.oauth.OAuth2AuthenticationFailureHandler;
+import com.spring.study.springsecurity.oauth.OAuth2AuthenticationSuccessHandler;
 import com.spring.study.springsecurity.security.refresh.service.RefreshTokenService;
 import com.spring.study.springsecurity.security.service.JwtAuthenticationFilter;
 import com.spring.study.springsecurity.security.service.JwtAuthorizationFilter;
@@ -17,7 +20,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -34,10 +36,9 @@ public class SecurityConfig {
   private final AuthenticationConfiguration authenticationConfiguration;
   private final RefreshTokenService refreshTokenService;
 
-  @Bean
-  public BCryptPasswordEncoder bCryptPasswordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+  private final CustomOAuth2UserService customOAuth2UserService;
+  private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+  private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
   @Bean
   public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
@@ -60,12 +61,28 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    log.debug("OAuth2 서비스 주입 여부: {}", customOAuth2UserService != null ? "성공" : "실패");
+    log.debug("OAuth2 성공 핸들러 주입 여부: {}", oAuth2AuthenticationSuccessHandler != null ? "성공" : "실패");
+
     http
         .csrf(AbstractHttpConfigurer::disable)
         .sessionManagement(session -> session
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // 세션을 사용하지 않음
+            .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
         )
         .httpBasic(AbstractHttpConfigurer::disable) // httpBasic 인증 비활성화
+
+        .oauth2Login(oauth2 -> {
+          log.info("OAuth2 로그인 설정");
+          oauth2
+              .userInfoEndpoint(userInfo -> {
+                log.info("userInfoEndpoint 설정");
+                userInfo.userService(customOAuth2UserService);
+                log.info("CustomOAuth2UserService 등록됨");
+              })
+              .successHandler(oAuth2AuthenticationSuccessHandler)
+              .failureHandler(oAuth2AuthenticationFailureHandler);
+          log.info("OAuth2 설정 완료");
+        })
 
         .addFilter(jwtAuthenticationFilter(jwtTokenProvider)) // 로그인 처리 필터
         .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class) // 토큰 검증 필터
@@ -75,6 +92,8 @@ public class SecurityConfig {
             "/api/auth/signup",
             "/api/auth/login",
             "/api/token/refresh",
+            "/oauth2/**",
+            "/login/**",
             "/",            // 메인 페이지
             "/error"        // 에러 페이지
         ).permitAll() // 인증 필요없는 url 설정

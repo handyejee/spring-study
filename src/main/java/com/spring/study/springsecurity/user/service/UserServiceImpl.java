@@ -1,22 +1,16 @@
 package com.spring.study.springsecurity.user.service;
 
 import com.spring.study.springsecurity.user.domain.User;
-import com.spring.study.springsecurity.user.dto.LoginRequestDto;
-import com.spring.study.springsecurity.user.dto.LoginResponseDto;
 import com.spring.study.springsecurity.user.dto.SignupRequestDto;
 import com.spring.study.springsecurity.user.dto.SignupResponseDto;
 import com.spring.study.springsecurity.user.dto.UserResponseDto;
 import com.spring.study.springsecurity.user.repository.UserRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,8 +18,7 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService{
 
   private final UserRepository userRepository;
-  private final AuthenticationManager authenticationManager;
-  private final BCryptPasswordEncoder passwordEncoder;
+  private final PasswordEncoder passwordEncoder;
 
   @Transactional
   public SignupResponseDto signupUser(SignupRequestDto request) {
@@ -34,7 +27,7 @@ public class UserServiceImpl implements UserService{
       throw new IllegalArgumentException("중복된 Email 입니다.");
     }
 
-    return SignupResponseDto.fromEntity(
+    return SignupResponseDto.from(
         userRepository.save(request.toEntity(passwordEncoder)));
   }
 
@@ -64,14 +57,14 @@ public class UserServiceImpl implements UserService{
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. ID: " + userId));
 
-    return UserResponseDto.fromEntity(user);
+    return UserResponseDto.from(user);
 
   }
 
   @Transactional(readOnly = true)
   public List<UserResponseDto> getAllUsers() {
     return userRepository.findAll().stream()
-        .map(UserResponseDto::fromEntity)
+        .map(UserResponseDto::from)
         .collect(Collectors.toList());
   }
 

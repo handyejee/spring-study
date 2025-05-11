@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>부앙단 홈페이지</title>
+  <link rel="stylesheet" href="/css/home.css">
+</head>
+<body>
+<div class="home-container">
+  <h1>부앙단 홈페이지</h1>
+
+  <div class="logo-container">
+    <img src="/images/booang.png" alt="부앙단 로고" class="logo-image">
+  </div>
+
+  <div id="not-logged-in" style="display: none;">
+    <p class="welcome-message">로그인이 필요합니다.</p>
+    <a href="/login" class="logout-btn" style="background-color: #3498db;">로그인 하기</a>
+  </div>
+
+  <div id="logged-in" style="display: none;">
+    <p class="welcome-message">로그인 성공! 환영합니다.</p>
+
+    <div class="user-info">
+      <h3>토큰 정보</h3>
+      <div class="token-info">
+        <p><strong>액세스 토큰:</strong> <span id="access-token-display">...</span></p>
+        <p><strong>리프레시 토큰:</strong> <span id="refresh-token-display">...</span></p>
+      </div>
+    </div>
+
+    <button onclick="logout()" class="logout-btn">로그아웃</button>
+  </div>
+</div>
+
+<script>
+  // 페이지 로드 시 토큰 확인
+  window.onload = function() {
+    const accessToken = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
+
+    if (accessToken && refreshToken) {
+      // 로그인 상태
+      document.getElementById('logged-in').style.display = 'block';
+      document.getElementById('not-logged-in').style.display = 'none';
+
+      // 토큰 표시 (보안을 위해 일부만 표시)
+      document.getElementById('access-token-display').textContent =
+          accessToken.substring(0, 15) + '...' + accessToken.substring(accessToken.length - 10);
+      document.getElementById('refresh-token-display').textContent =
+          refreshToken.substring(0, 15) + '...' + refreshToken.substring(refreshToken.length - 10);
+    } else {
+      // 로그아웃 상태
+      document.getElementById('logged-in').style.display = 'none';
+      document.getElementById('not-logged-in').style.display = 'block';
+    }
+  };
+
+  // 로그아웃 함수
+  function logout() {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    alert('로그아웃 되었습니다.');
+    window.location.reload();
+  }
+</script>
+</body>
+</html>

@@ -30,6 +30,11 @@ public class RefreshToken {
   @Column(nullable = false)
   private LocalDateTime expiryDate;
 
+  public void updateToken(String newToken, LocalDateTime newExpiryDate) {
+    this.refreshToken = newToken;
+    this.expiryDate = newExpiryDate;
+  }
+
   @Builder
   public RefreshToken(Long id, Long userId, String refreshToken, LocalDateTime expiryDate) {
     this.id = id;
