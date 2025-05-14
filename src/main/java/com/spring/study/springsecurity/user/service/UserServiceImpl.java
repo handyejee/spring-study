@@ -1,5 +1,7 @@
 package com.spring.study.springsecurity.user.service;
 
+import com.spring.study.springsecurity.exception.CustomException;
+import com.spring.study.springsecurity.exception.ErrorCode;
 import com.spring.study.springsecurity.user.domain.User;
 import com.spring.study.springsecurity.user.dto.SignupRequestDto;
 import com.spring.study.springsecurity.user.dto.SignupResponseDto;
@@ -24,7 +26,7 @@ public class UserServiceImpl implements UserService{
   public SignupResponseDto signupUser(SignupRequestDto request) {
 
     if (userRepository.existsByEmail(request.getEmail())) {
-      throw new IllegalArgumentException("중복된 Email 입니다.");
+      throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
     }
 
     return SignupResponseDto.from(
@@ -55,7 +57,7 @@ public class UserServiceImpl implements UserService{
   @Transactional(readOnly = true)
   public UserResponseDto getUserById(Long userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. ID: " + userId));
+        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
     return UserResponseDto.from(user);
 
@@ -71,7 +73,7 @@ public class UserServiceImpl implements UserService{
   @Transactional
   public void deleteUser(Long userId) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. ID: " + userId));
+        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
     userRepository.delete(user);
   }
 }
