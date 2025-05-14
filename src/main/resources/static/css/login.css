@@ -36,3 +36,8 @@ h1 {
 .oauth-btn:hover {
   background-color: #357AE8;
 }
+.logo-image {
+  /* 고정된 너비로 설정하고 비율 유지 */
+  width: 150px;
+  height: 150px;
+}
