@@ -15,7 +15,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -105,7 +104,7 @@ public class SecurityConfig {
         // 사용자 단건조회(본인 or MANAGER)
         .requestMatchers(HttpMethod.GET, "/api/users/{id}").access(
             new WebExpressionAuthorizationManager(
-                "hasRole('MANAGER') or #id == authentication.principal.id")
+                "hasRole('MANAGER') or #userId == authentication.principal.id")
         )
          .anyRequest().authenticated()
         );
