@@ -36,11 +36,27 @@ public class User {
   @Enumerated(value = EnumType.STRING)
   private UserRole role;
 
+  @Column
+  private String provider; // 인증서버
+
+  @Column
+  private String providerId; // OAuth2 제공자가 제공한 고유 ID
+
+
   @Builder
-  public User(String username, String email, String password, UserRole role) {
+  public User(String username, String email, String password, UserRole role, String provider, String providerId) {
     this.username = username;
     this.email = email;
     this.password = password;
     this.role = role;
+    this.provider = provider;
+    this.providerId = providerId;
+  }
+
+  public User update(String username) {
+    if (username != null) {
+      this.username = username;
+    }
+    return this;
   }
 }

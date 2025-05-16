@@ -15,7 +15,7 @@ public class SignupResponseDto {
   private String email;
   private UserRole role;
 
-  public static SignupResponseDto fromEntity(User user) {
+  public static SignupResponseDto from(User user) {
     return SignupResponseDto.builder()
         .username(user.getUsername())
         .email(user.getEmail())

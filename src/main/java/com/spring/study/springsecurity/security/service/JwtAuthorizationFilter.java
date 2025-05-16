@@ -1,6 +1,7 @@
 package com.spring.study.springsecurity.security.service;
 
 import com.spring.study.springsecurity.jwt.JwtTokenProvider;
+import com.spring.study.springsecurity.security.principle.PrincipalDetails;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -38,7 +39,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         Claims claims = jwtTokenProvider.getUserInfoFromToken(token); // 토큰에서 사용자 정보 추출
 
         Long userId = Long.parseLong(claims.getSubject());
-        UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserById(userId);
+        PrincipalDetails userDetails = (PrincipalDetails) userDetailsService.loadUserById(userId);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
             userDetails,

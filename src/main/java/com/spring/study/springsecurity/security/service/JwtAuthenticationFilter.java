@@ -2,6 +2,7 @@ package com.spring.study.springsecurity.security.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.spring.study.springsecurity.jwt.JwtTokenProvider;
+import com.spring.study.springsecurity.security.principle.PrincipalDetails;
 import com.spring.study.springsecurity.security.refresh.service.RefreshTokenService;
 import com.spring.study.springsecurity.user.domain.User;
 import com.spring.study.springsecurity.user.domain.UserRole;
@@ -53,7 +54,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
       FilterChain chain, Authentication authResult)
       throws IOException {
-    UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
+    PrincipalDetails userDetails = (PrincipalDetails) authResult.getPrincipal();
     User user = userDetails.getUser();
     UserRole role = user.getRole();
     Long userId = user.getId();

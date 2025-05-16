@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
 @NoArgsConstructor
@@ -27,7 +27,7 @@ public class SignupRequestDto {
   @NotNull
   private UserRole role;
 
-  public User toEntity(BCryptPasswordEncoder encoder) {
+  public User toEntity(PasswordEncoder encoder) {
     return User.builder()
         .email(this.email)
         .password(encoder.encode(password))
