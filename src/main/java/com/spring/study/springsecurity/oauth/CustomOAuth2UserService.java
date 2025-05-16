@@ -44,8 +44,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     String email = (String) attributes.get("email");
     String name = (String) attributes.get("name");
 
-    log.info("추출된 사용자 정보: providerId={}, email={}, name={}", providerId, email, name);
-
     // 사용자 저장 또는 업데이트
     User user = saveOrUpdate(email, name, registrationId, providerId);
     log.info("사용자 저장/업데이트 완료: id={}, email={}", user.getId(), user.getEmail());

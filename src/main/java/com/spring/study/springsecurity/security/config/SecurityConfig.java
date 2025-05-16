@@ -61,8 +61,6 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    log.debug("OAuth2 서비스 주입 여부: {}", customOAuth2UserService != null ? "성공" : "실패");
-    log.debug("OAuth2 성공 핸들러 주입 여부: {}", oAuth2AuthenticationSuccessHandler != null ? "성공" : "실패");
 
     http
         .csrf(AbstractHttpConfigurer::disable)

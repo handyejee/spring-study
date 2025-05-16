@@ -1,5 +1,6 @@
 package com.spring.study.springsecurity.oauth;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,18 +19,13 @@ public class WebController {
   @GetMapping("/login-success")
   public String loginSuccess(@RequestParam String accessToken,
       @RequestParam String refreshToken,
-      Model model) {
+      HttpSession session) {
 
-    log.info("로그인 성공 처리: accessToken={}, refreshToken={}",
-        accessToken.substring(0, Math.min(10, accessToken.length())) + "...",
-        refreshToken.substring(0, Math.min(10, refreshToken.length())) + "...");
+    // 토큰을 세션에 저장
+    session.setAttribute("accessToken", accessToken);
+    session.setAttribute("refreshToken", refreshToken);
 
-    model.addAttribute("accessToken", accessToken);
-    model.addAttribute("refreshToken", refreshToken);
-
-    log.info("모델에 추가된 속성: {}", model.asMap().keySet());
-
-    return "login-success";  // templates/login-success.html로 연결
+    return "login-success";
   }
 
   @GetMapping("/login-failed")

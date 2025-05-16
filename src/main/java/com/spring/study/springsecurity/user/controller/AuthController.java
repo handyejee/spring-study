@@ -25,7 +25,6 @@ public class AuthController {
 
   @PostMapping("/signup")
   public ResponseEntity<SignupResponseDto> signup(@RequestBody @Valid SignupRequestDto request) {
-    log.info("회원가입 컨트롤러 진입: {}", request.getEmail());
     SignupResponseDto response = authService.signupUser(request);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
