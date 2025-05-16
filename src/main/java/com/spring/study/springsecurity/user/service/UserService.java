@@ -10,7 +10,7 @@ import java.util.List;
 public interface UserService {
 
   SignupResponseDto signupUser(SignupRequestDto request);
-  LoginResponseDto login(LoginRequestDto request);
+//  LoginResponseDto login(LoginRequestDto request);
   UserResponseDto getUserById(Long userId);
   List<UserResponseDto> getAllUsers();
   void deleteUser(Long userId);

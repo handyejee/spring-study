@@ -21,4 +21,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     return new UserDetailsImpl(user);
   }
+
+  public UserDetails loadUserById(Long id) {
+    User user = userRepository.findById(id)
+        .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다. ID: " + id));
+
+    return new UserDetailsImpl(user);
+  }
 }
