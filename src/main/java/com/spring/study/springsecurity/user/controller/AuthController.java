@@ -4,7 +4,7 @@ import com.spring.study.springsecurity.user.dto.LoginRequestDto;
 import com.spring.study.springsecurity.user.dto.LoginResponseDto;
 import com.spring.study.springsecurity.user.dto.SignupRequestDto;
 import com.spring.study.springsecurity.user.dto.SignupResponseDto;
-import com.spring.study.springsecurity.user.service.UserService;
+import com.spring.study.springsecurity.user.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,19 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-  private final UserService userService;
+  private final AuthService authService;
 
   @PostMapping("/signup")
   public ResponseEntity<SignupResponseDto> signup(@RequestBody @Valid SignupRequestDto request) {
     log.info("회원가입 컨트롤러 진입: {}", request.getEmail());
-    SignupResponseDto response = userService.signupUser(request);
+    SignupResponseDto response = authService.signupUser(request);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
-
-//  @PostMapping("/login")
-//  public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid LoginRequestDto request) {
-//    return ResponseEntity.ok(userService.login(request));
-//  }
-
 }
