@@ -22,5 +22,5 @@ OAuth 설정 - Google Client ID/Secret 환경변수 설정
 
 `POST /api/auth/signup` - 회원가입  
 `POST /api/auth/login` - 로그인  
-`GET /oauth2/authorization/google` - Google 로그인
+`GET /oauth2/authorization/google` - Google 로그인  
 `GET /api/users` - 권한별로 제한된 사용자 목록 조회
